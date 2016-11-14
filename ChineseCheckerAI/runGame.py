@@ -16,7 +16,7 @@ def runGame(ccgame, agents):
     return state[1].isEnd()[1] # return the winner
 
 if __name__ == '__main__':
-    simulation_times = 500
+    simulation_times = 100
     win_times = 0
     for i in range(simulation_times):
         ccgame = SimplifiedChineseChecker(4, 2)
