@@ -20,21 +20,25 @@ class SimplifiedBoard(object):
                     self.board_status[(row, col)] = 1
 
     def isEmptyPosition(self, pos):
+        # check if pos is empty (no pieces there)
         return self.board_status[pos] == 0
 
     def leftPosition(self, pos):
+        # return the position left to current position
         row = pos[0]
         col = pos[1]
         if (row, col - 1) in self.board_status.keys():
             return (row, col-1)
 
     def rightPosition(self, pos):
+        # return position right to current position
         row = pos[0]
         col = pos[1]
         if (row, col + 1) in self.board_status.keys():
             return (row, col + 1)
 
     def upLeftPosition(self, pos):
+        # return position upleft to current position
         row = pos[0]
         col = pos[1]
         if row <= self.size and (row-1, col-1) in self.board_status.keys():
@@ -43,6 +47,7 @@ class SimplifiedBoard(object):
             return (row-1, col)
 
     def upRightPosition(self, pos):
+        # return position upright to current position
         row = pos[0]
         col = pos[1]
         if row <= self.size and (row-1, col) in self.board_status.keys():
@@ -51,6 +56,7 @@ class SimplifiedBoard(object):
             return (row-1, col+1)
 
     def downLeftPosition(self, pos):
+        # return position downleft to current position
         row = pos[0]
         col = pos[1]
         if row < self.size and (row+1, col) in self.board_status.keys():
@@ -59,6 +65,7 @@ class SimplifiedBoard(object):
             return (row+1, col-1)
 
     def downRightPosition(self, pos):
+        # return position downright to current position
         row = pos[0]
         col = pos[1]
         if row < self.size and (row+1, col+1) in self.board_status.keys():
@@ -67,6 +74,7 @@ class SimplifiedBoard(object):
             return (row+1, col)
 
     def adjacentPositions(self, pos):
+        # return a list of adjacent positions (6 at most) of current positions
         result = []
         result.append(self.leftPosition(pos))
         result.append(self.rightPosition(pos))
@@ -77,6 +85,7 @@ class SimplifiedBoard(object):
         return filter(lambda x: x is not None, result)
 
     def getPlayerPiecePositions(self, player):
+        # return a list of positions that player's pieces occupy
         result1 = [(row, col) for row in range(1, self.size+1) for col in range(1, row+1) \
                    if self.board_status[(row,col)] == player]
         result2 = [(row, col) for row in range(self.size+1, self.size*2) for col in range(1, self.size*2-row+1)\
@@ -84,6 +93,9 @@ class SimplifiedBoard(object):
         return result1 + result2
 
     def getOneDirectionHopPosition(self, pos, dir_func):
+        # return possible target hop position in the direction designated by dir_func
+        # our rule: can hop as long as there's only one piece on the line between current position and target position
+        # and the piece hopped over is at the middle point
         hop_over_pos = dir_func(pos)
         count = 0
         while hop_over_pos is not None:
@@ -102,6 +114,7 @@ class SimplifiedBoard(object):
                 return target_position
 
     def getOneHopPositions(self, pos):
+        # return all positions can be reached from current position in one hop in all 6 directions
         result = []
         result.append(self.getOneDirectionHopPosition(pos, self.leftPosition))
         result.append(self.getOneDirectionHopPosition(pos, self.rightPosition))
@@ -112,6 +125,7 @@ class SimplifiedBoard(object):
         return filter(lambda x: x is not None, result)
 
     def getAllHopPositions(self, pos):
+        # return all positions can be reached from current position in several hops
         result = self.getOneHopPositions(pos)
         start_index = 0
         while start_index < len(result):
@@ -123,29 +137,29 @@ class SimplifiedBoard(object):
             start_index = cur_size
         return result
 
+    def ifPlayerWin(self, player):
+        # return if all player's pieces reach the target triangle
+        if player == 1:
+            for row in range(1, self.piece_rows + 1):
+                for col in range(1, row + 1):
+                    if self.board_status[(row, col)] == 1:
+                        continue
+                    else:
+                        return False
+            return True
+        else:
+            for row in range(self.size * 2 - self.piece_rows, self.size * 2):
+                for col in range(1, self.size * 2 - row + 1):
+                    if self.board_status[(row, col)] == 2:
+                        continue
+                    else:
+                        return False
+            return True
+
     def isEnd(self):
-        player_1_reached = True
-        for row in range(1, self.piece_rows+1):
-            for col in range(1, row+1):
-                if self.board_status[(row, col)] == 1:
-                    continue
-                else:
-                    player_1_reached = False
-                    break
-            if not player_1_reached:
-                break
-        player_2_reached = True
-        for row in range(self.size*2 - self.piece_rows, self.size*2):
-            for col in range(1, self.size*2-row+1):
-                if self.board_status[(row, col)] == 2:
-                    continue
-                else:
-                    player_2_reached = False
-                    break
-            if not player_2_reached:
-                break
-        if player_1_reached and player_2_reached:
-            return (True, 0) # tie
+        # return if current board is an ending board (True/False, winner)
+        player_1_reached = self.ifPlayerWin(1)
+        player_2_reached = self.ifPlayerWin(2)
         if player_1_reached:
             return (True, 1) # player 1 wins
         if player_2_reached:
@@ -153,6 +167,7 @@ class SimplifiedBoard(object):
         return (False, None) # haven't reach the end
 
     def printBoard(self):
+        # print current board
         for row in range(1, self.size+1):
             print ' ' * (self.size - row),
             for col in range(1, row+1):
