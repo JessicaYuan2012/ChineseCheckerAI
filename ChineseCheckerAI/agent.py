@@ -100,80 +100,48 @@ class MiniMaxAgent(Agent):
 class MiniMaxAlphaBetaAgent(Agent):
     # Minimax agent
     def getAction(self, state):
+        depth = 1
         legal_actions = self.game.actions(state)
         player = self.game.player(state)
-
-        depth = 2
-
-        alpha = -float('inf')  # The lower bound
-        beta = float('inf')  # The upper bound
-        score = []
-        for action in legal_actions:
-            NodeScore = self.Vmaxmin(self.game.succ(state, action), depth, player, alpha, beta)
-            score.append(NodeScore)
-            # if not overlap, break(which should not in this case since it compute the lower bound which should always overlap with beta = -inf)
-            if not self.Overlap(NodeScore, alpha, beta, player):
-                # print "break"
-                break
-
-        max_score = max(score)
-        max_actions = [legal_actions[index] for index in range(len(score)) if score[index] == max_score]
-
-        return random.choice(max_actions)
-
-    def Overlap(self, num, alpha, beta, agentnum):
-        # alpha: lower bound, the number needs to be >= alpha
-        # beta: upper bound, the number needs to be <= beta
-        # for agent = mainplayer, the interval is >= num
-        # else,          the interval is <= num
-        if agentnum == 1:  # mainplayer which num is the temperary lower bound to test
-            if num >= beta:  # Temperary lower bound num is higher than beta, which is the upper bound -> not overlap
-                return 0
-            else:
-                return 1
-        else:  # opponent which num is the temperary upper bound to test
-            if num <= alpha:  # Temperary Upper bound num is lower than Alpha, which is the lower bound -> not overlap
-                return 0
-            else:
-                return 1
-
-    # Define function Vmaxmin(s, d, agentnum) to compute the score
-    def Vmaxmin(self, CurrentGameState, d, agentnum, alpha, beta):
-
-        if self.game.isEnd(CurrentGameState):
-            return self.game.utility(CurrentGameState)
-        elif d == 0:
-            return self.evaluationFunction(CurrentGameState)
-
-        # check the depth make recursion
-        agentnum += 1
-        if agentnum == 3:  # go back to the agent 1
-            agentnum = 1
-        if agentnum == 2:  # reach the opponent in a depth level
-            d -= 1
-
-        # Get the legal moves, (next agent)
-        legal_actions = self.game.actions(CurrentGameState)
-
-        Allscore = []
-        for action in legal_actions:
-            NodeScore = self.Vmaxmin(self.game.succ(CurrentGameState, action), d, agentnum, alpha, beta)
-            Allscore.append(NodeScore)
-            # if not overlap, break(which should not in this case since it compute the lower bound which should always overlap with beta = -inf)
-            if not self.Overlap(NodeScore, alpha, beta, agentnum):
-                # print "break"
-                break
-            if agentnum == 1:
-                if NodeScore > alpha:  # compare with alpha for mainplayer
-                    alpha = NodeScore
-            else:
-                if NodeScore < beta:  # compare with bete for opponent
-                    beta = NodeScore
-
-        if agentnum == 1:
-            return max(Allscore)
+        alpha = -float('inf')
+        beta = float('inf')
+        score = [self.alphabeta(self.game.succ(state, action), depth, alpha, beta, 3-player) for action in legal_actions]
+        if player == 1:
+            max_score = max(score)
+            max_actions = [legal_actions[index] for index in range(len(score)) if score[index] == max_score]
+            return random.choice(max_actions)
         else:
-            return min(Allscore)
+            min_score = min(score)
+            min_actions = [legal_actions[index] for index in range(len(score)) if score[index] == min_score]
+            return random.choice(min_actions)
+
+    def alphabeta(self, state, depth, alpha, beta, player):
+        if self.game.isEnd(state):
+            # return self.game.utility(state)
+            return self.evaluationFunction(state)
+        elif depth == 0:
+            return self.evaluationFunction(state)
+
+        if player == 1:
+            v = float('-inf')
+            legal_actions = self.game.actions(state)
+            for action in legal_actions:
+                succ = self.game.succ(state, action)
+                v = max(v, self.alphabeta(succ, depth-1, alpha, beta, 3-player))
+                alpha = max(alpha, v)
+                if beta <= alpha:
+                    break
+            return v
+        else:
+            v = float('inf')
+            legal_actions = self.game.actions(state)
+            for action in legal_actions:
+                succ = self.game.succ(state, action)
+                v = min(v, self.alphabeta(succ, depth-1, alpha, beta, 3-player))
+                beta = min(beta, v)
+                if beta <= alpha:
+                    break
+            return v
 
     def evaluationFunction(self, currentGameState):
         size = self.game.size

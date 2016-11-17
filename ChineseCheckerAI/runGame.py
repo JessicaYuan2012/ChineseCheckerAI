@@ -47,6 +47,6 @@ def simulateMultipleGames(agents_dict, simulation_times, ccgame):
 if __name__ == '__main__':
     ccgame = SimplifiedChineseChecker(5,3)
     #runGame(ccgame, {1:SimpleGreedyAgent(ccgame), 2:RandomAgent(ccgame)})
-    simulateMultipleGames({1:SimpleGreedyAgent, 2:MiniMaxAgent}, 100, ccgame)
+    simulateMultipleGames({1: SimpleGreedyAgent, 2: MiniMaxAlphaBetaAgent}, 25, ccgame)
 
 
