@@ -3,7 +3,7 @@ from game import SimplifiedChineseChecker
 
 def runGame(ccgame, agents):
     state = ccgame.startState()
-    max_iter = 1000  # deal with some stuck situations
+    max_iter = 100  # deal with some stuck situations
     iter = 0
     while (not ccgame.isEnd(state)) and iter < max_iter:
         iter += 1
@@ -17,6 +17,7 @@ def runGame(ccgame, agents):
     print 'final board:'
     state[1].printBoard()
     if ccgame.isEnd(state):
+        # print ccgame.utility(state)
         return (state[1].isEnd()[1], ccgame.utility(state)) # return (winner, utility)
     else: # stuck situation
         print 'stuck!'
@@ -41,11 +42,11 @@ def simulateMultipleGames(agents_dict, simulation_times, ccgame):
     print 'In', simulation_times, 'simulations:'
     print 'winning rate:', win_times * 1.0 / simulation_times
     print 'stuck times:', stuck_times
-    print 'average utility', utility_sum * 1.0 / simulation_times
+    # print 'average utility', utility_sum * 1.0 / simulation_times
 
 if __name__ == '__main__':
-    ccgame = SimplifiedChineseChecker(4,3)
-    #runGame(ccgame, {1:SimpleGreedyAgent(ccgame), 2:HumanAgent(ccgame)})
-    simulateMultipleGames({1:SimpleGreedyAgent, 2:RandomAgent}, 100, ccgame)
+    ccgame = SimplifiedChineseChecker(5,3)
+    #runGame(ccgame, {1:SimpleGreedyAgent(ccgame), 2:RandomAgent(ccgame)})
+    simulateMultipleGames({1:SimpleGreedyAgent, 2:MiniMaxAgent}, 100, ccgame)
 
 

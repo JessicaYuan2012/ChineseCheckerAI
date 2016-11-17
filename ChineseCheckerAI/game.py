@@ -43,11 +43,11 @@ class SimplifiedChineseChecker(object):
     def utility(self, state):
         end_info = state[1].isEnd()
         assert end_info[0]
-        steps = self.stepsToGo(state, 3-end_info[1])
+        # steps = self.stepsToGo(state, 3-end_info[1])
         if end_info[1] == 1:
-            return steps
+            return 1
         else:
-            return -steps
+            return -1
 
     def actions(self, state):
         # return possible actions current player can take in a list [(old_pos), (new_pos)]
