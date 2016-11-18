@@ -7,17 +7,23 @@ class SimplifiedBoard(object):
         # player is 1 (agent), 2 (opp)
         # 1's pieces are at the bottom, and 2's are on the top at initialization
         for row in range(1, size+1):
-            for col in range(1, row+1):
+            for col in range(1, self.getColNum(row) + 1):
                 if row <= piece_rows:
                     self.board_status[(row, col)] = 2
                 else:
                     self.board_status[(row, col)] = 0
         for row in range(size+1, size*2):
-            for col in range(1, size*2-row+1):
+            for col in range(1, self.getColNum(row) + 1):
                 if row < size*2 - piece_rows:
                     self.board_status[(row, col)] = 0
                 else:
                     self.board_status[(row, col)] = 1
+
+    def getColNum(self, row):
+        if row in range(1, self.size+1):
+            return row
+        else:
+            return self.size * 2 - row
 
     def isEmptyPosition(self, pos):
         # check if pos is empty (no pieces there)
@@ -86,9 +92,9 @@ class SimplifiedBoard(object):
 
     def getPlayerPiecePositions(self, player):
         # return a list of positions that player's pieces occupy
-        result1 = [(row, col) for row in range(1, self.size+1) for col in range(1, row+1) \
+        result1 = [(row, col) for row in range(1, self.size+1) for col in range(1, self.getColNum(row)+1) \
                    if self.board_status[(row,col)] == player]
-        result2 = [(row, col) for row in range(self.size+1, self.size*2) for col in range(1, self.size*2-row+1)\
+        result2 = [(row, col) for row in range(self.size+1, self.size*2) for col in range(1, self.getColNum(row)+1)\
                    if self.board_status[(row, col)] == player]
         return result1 + result2
 
@@ -141,7 +147,7 @@ class SimplifiedBoard(object):
         # return if all player's pieces reach the target triangle
         if player == 1:
             for row in range(1, self.piece_rows + 1):
-                for col in range(1, row + 1):
+                for col in range(1, self.getColNum(row)+1):
                     if self.board_status[(row, col)] == 1:
                         continue
                     else:
@@ -149,7 +155,7 @@ class SimplifiedBoard(object):
             return True
         else:
             for row in range(self.size * 2 - self.piece_rows, self.size * 2):
-                for col in range(1, self.size * 2 - row + 1):
+                for col in range(1, self.getColNum(row)+1):
                     if self.board_status[(row, col)] == 2:
                         continue
                     else:
@@ -170,12 +176,12 @@ class SimplifiedBoard(object):
         # print current board
         for row in range(1, self.size+1):
             print ' ' * (self.size - row),
-            for col in range(1, row+1):
+            for col in range(1, self.getColNum(row)+1):
                 print str(self.board_status[(row, col)]),
             print '\n',
         for row in range(self.size+1, self.size*2):
             print ' ' * (row - self.size),
-            for col in range(1, self.size*2-row+1):
+            for col in range(1, self.getColNum(row)+1):
                 print str(self.board_status[(row, col)]),
             print '\n',
 

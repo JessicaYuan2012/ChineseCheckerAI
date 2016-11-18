@@ -1,10 +1,12 @@
 from agent import *
 from game import SimplifiedChineseChecker
+import datetime
 
 def runGame(ccgame, agents):
     state = ccgame.startState()
     max_iter = 100  # deal with some stuck situations
     iter = 0
+    start = datetime.datetime.now()
     while (not ccgame.isEnd(state)) and iter < max_iter:
         iter += 1
         # print 'current board:'
@@ -16,6 +18,8 @@ def runGame(ccgame, agents):
         state = ccgame.succ(state, action)
     print 'final board:'
     state[1].printBoard()
+    end = datetime.datetime.now()
+    print 'time spent:', end-start
     if ccgame.isEnd(state):
         # print ccgame.utility(state)
         return (state[1].isEnd()[1], ccgame.utility(state)) # return (winner, utility)
@@ -40,13 +44,14 @@ def simulateMultipleGames(agents_dict, simulation_times, ccgame):
         utility_sum += run_result[1]
         print 'game', i+1, 'finished'
     print 'In', simulation_times, 'simulations:'
+    print 'winning times:', win_times
     print 'winning rate:', win_times * 1.0 / simulation_times
     print 'stuck times:', stuck_times
     # print 'average utility', utility_sum * 1.0 / simulation_times
 
 if __name__ == '__main__':
-    ccgame = SimplifiedChineseChecker(5,3)
+    ccgame = SimplifiedChineseChecker(5, 3)
     #runGame(ccgame, {1:SimpleGreedyAgent(ccgame), 2:RandomAgent(ccgame)})
-    simulateMultipleGames({1: SimpleGreedyAgent, 2: MiniMaxAlphaBetaAgent}, 25, ccgame)
+    simulateMultipleGames({1: SimpleGreedyAgent , 2: MiniMaxAlphaBetaAgent}, 25, ccgame)
 
 

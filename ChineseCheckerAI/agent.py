@@ -68,7 +68,8 @@ class MiniMaxAgent(Agent):
     # Define function Vmaxmin(s, d, agentnum) to compute the score
     def Vmaxmin(self, CurrentGameState, d):
         if self.game.isEnd(CurrentGameState):
-            return self.game.utility(CurrentGameState)
+            return self.evaluationFunction(CurrentGameState)
+            # return self.game.utility(CurrentGameState)
         elif d == 0:
             return self.evaluationFunction(CurrentGameState)
 
