@@ -1,6 +1,7 @@
 from board import SimplifiedBoard
 import copy
 
+
 class SimplifiedChineseChecker(object):
     def __init__(self, size, piece_rows):
         self.size = size
@@ -67,7 +68,11 @@ class SimplifiedChineseChecker(object):
             for new_pos in board.getAllHopPositions(pos):
                 if (pos, new_pos) not in action_list:
                     action_list.append((pos, new_pos))
-        return action_list
+
+        if player == 1:
+            return filter(lambda a: a[0][0] >= a[1][0], action_list)
+        else:
+            return filter(lambda a: a[0][0] <= a[1][0], action_list)
 
     def player(self, state):
         return state[0]

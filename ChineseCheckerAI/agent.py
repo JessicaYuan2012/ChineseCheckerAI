@@ -52,7 +52,7 @@ class RandomAgent(Agent):
 class MiniMaxAgent(Agent):
     # Minimax agent
     def getAction(self, state):
-        depth = 1
+        depth = 2
         legal_actions = self.game.actions(state)
         player = self.game.player(state)
         score = [self.Vmaxmin(self.game.succ(state, action), depth) for action in legal_actions]
@@ -75,12 +75,11 @@ class MiniMaxAgent(Agent):
 
         # Get the legal moves, (next agent)
         legal_actions = self.game.actions(CurrentGameState)
+        Allscore = [self.Vmaxmin(self.game.succ(CurrentGameState, action), d - 1) for action in legal_actions]
         agentnum = CurrentGameState[0]
         if agentnum == 1:
-            Allscore = [self.Vmaxmin(self.game.succ(CurrentGameState, action), d) for action in legal_actions]
             return max(Allscore)
         else:
-            Allscore = [self.Vmaxmin(self.game.succ(CurrentGameState, action), d-1) for action in legal_actions]
             return min(Allscore)
 
     def evaluationFunction(self, currentGameState):
@@ -101,12 +100,13 @@ class MiniMaxAgent(Agent):
 class MiniMaxAlphaBetaAgent(Agent):
     # Minimax agent
     def getAction(self, state):
-        depth = 1
+        depth = 2
         legal_actions = self.game.actions(state)
         player = self.game.player(state)
         alpha = -float('inf')
         beta = float('inf')
-        score = [self.alphabeta(self.game.succ(state, action), depth, alpha, beta, 3-player) for action in legal_actions]
+        score = [self.alphabeta(self.game.succ(state, action), depth, alpha, beta, 3 - player) for action in
+                 legal_actions]
         if player == 1:
             max_score = max(score)
             max_actions = [legal_actions[index] for index in range(len(score)) if score[index] == max_score]
@@ -128,7 +128,7 @@ class MiniMaxAlphaBetaAgent(Agent):
             legal_actions = self.game.actions(state)
             for action in legal_actions:
                 succ = self.game.succ(state, action)
-                v = max(v, self.alphabeta(succ, depth-1, alpha, beta, 3-player))
+                v = max(v, self.alphabeta(succ, depth - 1, alpha, beta, 3 - player))
                 alpha = max(alpha, v)
                 if beta <= alpha:
                     break
@@ -138,7 +138,7 @@ class MiniMaxAlphaBetaAgent(Agent):
             legal_actions = self.game.actions(state)
             for action in legal_actions:
                 succ = self.game.succ(state, action)
-                v = min(v, self.alphabeta(succ, depth-1, alpha, beta, 3-player))
+                v = min(v, self.alphabeta(succ, depth - 1, alpha, beta, 3 - player))
                 beta = min(beta, v)
                 if beta <= alpha:
                     break
