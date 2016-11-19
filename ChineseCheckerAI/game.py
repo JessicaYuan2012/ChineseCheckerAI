@@ -23,14 +23,12 @@ class SimplifiedChineseChecker(object):
         remain_steps = 0
         while True:
             remain_steps += 1
+            if remain_steps >= 5:
+                return remain_steps
             new_frontier = []
             for new_state in frontier:
                 new_state = (player, new_state[1])
                 for action in self.actions(new_state):
-                    if player == 2 and action[0][0] > action[1][0]:
-                        continue
-                    if player == 1 and action[0][0] < action[1][0]:
-                        continue
                     succ = (player, self.succ(new_state, action)[1])
                     if succ[1].ifPlayerWin(player):
                         return remain_steps
@@ -45,10 +43,11 @@ class SimplifiedChineseChecker(object):
         end_info = state[1].isEnd()
         assert end_info[0]
         # steps = self.stepsToGo(state, 3-end_info[1])
+        steps = 1
         if end_info[1] == 1:
-            return 1
+            return steps
         else:
-            return -1
+            return -steps
 
     def actions(self, state):
         # return possible actions current player can take in a list [(old_pos), (new_pos)]

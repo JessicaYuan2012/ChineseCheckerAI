@@ -185,22 +185,3 @@ class SimplifiedBoard(object):
             for col in range(1, self.getColNum(row) + 1):
                 print str(self.board_status[(row, col)]),
             print '\n',
-
-            # simplified_board = SimplifiedBoard(5,0)
-            # simplified_board.board_status[(5, 2)] = 1
-            # simplified_board.board_status[(5, 3)] = 1
-            # simplified_board.board_status[(5, 4)] = 1
-            # simplified_board.board_status[(5, 5)] = 1
-            # simplified_board.board_status[(4, 3)] = 1
-            # simplified_board.board_status[(2, 1)] = 1
-            # simplified_board.board_status[(3, 1)] = 1
-            # simplified_board.printBoard()
-            # simplified_board.board_status[(2, 2)] = 1
-            # simplified_board.board_status[(6, 1)] = 2
-            # simplified_board.board_status[(6, 2)] = 2
-            # simplified_board.board_status[(5, 1)] = 2
-            #
-            # print simplified_board.isEnd()
-
-            # print simplified_board.adjacentPositions((5,2))
-            # print simplified_board.getAllHopPositions((2,1))

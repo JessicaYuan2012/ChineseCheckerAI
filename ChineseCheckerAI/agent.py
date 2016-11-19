@@ -51,11 +51,15 @@ class RandomAgent(Agent):
 
 class MiniMaxAgent(Agent):
     # Minimax agent
+    def __init__(self, game, depth=3):
+        self.game = game
+        # here the definition of depth is number of layers to visit in the game tree
+        self.depth = depth
+
     def getAction(self, state):
-        depth = 2
         legal_actions = self.game.actions(state)
         player = self.game.player(state)
-        score = [self.Vmaxmin(self.game.succ(state, action), depth) for action in legal_actions]
+        score = [self.Vmaxmin(self.game.succ(state, action), self.depth - 1) for action in legal_actions]
         if player == 1:
             max_score = max(score)
             max_actions = [legal_actions[index] for index in range(len(score)) if score[index] == max_score]
@@ -99,13 +103,23 @@ class MiniMaxAgent(Agent):
 # Minimax with alpha beta pruning
 class MiniMaxAlphaBetaAgent(Agent):
     # Minimax agent
+    def __init__(self, game, depth=3, evalFunction=None):
+        self.game = game
+        # here the definition of depth is number of layers to visit in the game tree
+        self.depth = depth
+        if evalFunction is None:
+            self.evaluationFunction = self.naiveEvaluationFunction
+        else:
+            self.evaluationFunction = evalFunction
+
     def getAction(self, state):
-        depth = 2
         legal_actions = self.game.actions(state)
+        if not legal_actions:  # stuck
+            return None
         player = self.game.player(state)
         alpha = -float('inf')
         beta = float('inf')
-        score = [self.alphabeta(self.game.succ(state, action), depth, alpha, beta, 3 - player) for action in
+        score = [self.alphabeta(self.game.succ(state, action), self.depth - 1, alpha, beta, 3 - player) for action in
                  legal_actions]
         if player == 1:
             max_score = max(score)
@@ -144,7 +158,7 @@ class MiniMaxAlphaBetaAgent(Agent):
                     break
             return v
 
-    def evaluationFunction(self, currentGameState):
+    def naiveEvaluationFunction(self, currentGameState):
         size = self.game.size
         board = currentGameState[1]
         # The Evaluation function considers the sum of distances of each piece to the corner
