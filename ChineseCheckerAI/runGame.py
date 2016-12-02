@@ -54,7 +54,25 @@ def simulateMultipleGames(agents_dict, simulation_times, ccgame):
 
 if __name__ == '__main__':
     ccgame = SimplifiedChineseChecker(5, 3)
-    evalFunction = getEvalFunctionViaTDlearning(ccgame, featureExtractor, num_trials=100)
-    tdAgent = MiniMaxAlphaBetaAgent(ccgame, depth=2, evalFunction=evalFunction)
+    # # 0. human agent
+    # humanAgent = HumanAgent(ccgame)
+    # # 1. baseline - simple greedy agent
+    # simpleGreedyAgent = SimpleGreedyAgent(ccgame)
+    # 2. minimax agent with naive evaluation function
     minimaxAgent = MiniMaxAlphaBetaAgent(ccgame, depth=2)
-    simulateMultipleGames({1: tdAgent, 2: minimaxAgent}, 25, ccgame)
+
+    # 3. minimax agent with different evaluation function learned via TD-learning
+    featureFuctionList1 = [averageVerticalDistanceToGoalVertex(1), averageVerticalDistanceToGoalVertex(2), intercept]
+    # featureFuctionList1 = [diffOfAvgVerDistToGoalVertex, intercept]
+    featureExtractor1 = getFeatureExtractor(featureFuctionList1)
+    evalFunction1 = getEvalFunctionViaTDlearning(ccgame, featureExtractor1, num_trials=500)
+    tdAgent1 = MiniMaxAlphaBetaAgent(ccgame, depth=2, evalFunction=evalFunction1)
+
+    # featureFuctionList2 = [averageVerticalDistanceToGoalVertex(1), averageVerticalDistanceToGoalVertex(2),
+    #                        verticalVariance(1), verticalVariance(2)]
+    # featureExtractor2 = getFeatureExtractor(featureFuctionList2)
+    # evalFunction2 = getEvalFunctionViaTDlearning(ccgame, featureExtractor2, num_trials=100)
+    # tdAgent2 = MiniMaxAlphaBetaAgent(ccgame, depth=2, evalFunction=evalFunction2)
+
+    simulateMultipleGames({1: tdAgent1, 2: minimaxAgent}, 10, ccgame)
+    plt.show()

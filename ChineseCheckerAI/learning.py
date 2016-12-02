@@ -1,5 +1,7 @@
 from collections import defaultdict
 import random, math, sys
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 class TDLearningAlgorithm():
@@ -38,9 +40,10 @@ class TDLearningAlgorithm():
                 return random.choice(min_actions)
 
     def getStepSize(self):
-        return 1.0 / math.sqrt(self.numIters)
+        return 1.0 / self.numIters
 
     def incorporateFeedback(self, state, reward, newState):
+        # print 'step size now:', self.getStepSize()
         residual = self.getV(state) - (reward + self.discount * self.getV(newState))
         for f, v in self.featureExtractor(state):
             self.weights[f] -= self.getStepSize() * residual * v
@@ -48,6 +51,7 @@ class TDLearningAlgorithm():
 
 def simulate(game, rl, numTrials=100, maxIterations=200, verbose=False):
     utility_list = []
+    weight_update_history = defaultdict(list)
     for trial in range(numTrials):
         state = game.startState()
         totalDiscount = 1
@@ -68,26 +72,67 @@ def simulate(game, rl, numTrials=100, maxIterations=200, verbose=False):
             iter += 1
         if verbose:
             if game.isEnd(state):
-                print "Trial %d (final utility = %s)" % (trial+1, game.utility(state))
+                print "Trial %d (final utility = %s)" % (trial + 1, game.utility(state))
                 utility_list.append(game.utility(state))
             else:
-                print "Trial %d (final utility = %s)" % (trial+1, 0)
+                print "Trial %d (final utility = %s)" % (trial + 1, 0)
                 utility_list.append(0)
-            print 'weights after trial:', trial
+            print 'weights after trial:', trial+1
             for feature in rl.weights:
+                weight_update_history[feature].append(rl.weights[feature])
                 print feature, rl.weights[feature]
+    format_list = ['r--', 'b--', 'g--', 'c--', 'm--', 'y--', 'k--']
+    for i in range(0, len(rl.weights.keys())):
+        plt.plot(range(1, numTrials + 1), weight_update_history[rl.weights.keys()[i]], format_list[i])
     return utility_list
 
 
-def featureExtractor(state):
+def averageVerticalDistanceToGoalVertex(player):
+    def averageVerticalDistanceToGoalVertexOnePlayer(state):
+        board = state[1]
+        size = board.size
+        player_piece_pos_list = board.getPlayerPiecePositions(player)
+        if player == 1:
+            score = sum([pos[0] - 1 for pos in player_piece_pos_list]) * 1.0 / len(player_piece_pos_list)
+        else:
+            score = sum([2 * size - 1 - pos[0] for pos in player_piece_pos_list]) * 1.0 / len(player_piece_pos_list)
+        return 'avg vertical dist ' + str(player), score
+
+    return averageVerticalDistanceToGoalVertexOnePlayer
+
+
+def diffOfAvgVerDistToGoalVertex(state):
     board = state[1]
     size = board.size
     player_piece_pos_list1 = board.getPlayerPiecePositions(1)
-    p1score = sum([pos[0] - 1 for pos in player_piece_pos_list1]) * 1.0 / len(player_piece_pos_list1)
+    dist1 = sum([pos[0] - 1 for pos in player_piece_pos_list1]) * 1.0 / len(player_piece_pos_list1)
     player_piece_pos_list2 = board.getPlayerPiecePositions(2)
-    p2score = sum([2 * size - 1 - pos[0] for pos in player_piece_pos_list2]) * 1.0 / len(player_piece_pos_list2)
-    features = [('p1 score', p1score), ('p2 score', p2score), ('intercept', 1)]
-    return features
+    dist2 = sum([2 * size - 1 - pos[0] for pos in player_piece_pos_list2]) * 1.0 / len(player_piece_pos_list2)
+    return 'diff of avg vertical dist', dist1 - dist2
+
+
+def verticalVariance(player):
+    def verticalVarianceOnePlayer(state):
+        board = state[1]
+        player_piece_row_list = [pos[0] for pos in board.getPlayerPiecePositions(player)]
+        var = np.var(player_piece_row_list)
+        return 'vertical var ' + str(player), var
+
+    return verticalVarianceOnePlayer
+
+
+def intercept(state):
+    return 'intercept', 1.0
+
+
+def getFeatureExtractor(featureFunctionList):
+    def featureExtractor(state):
+        features = []
+        for f in featureFunctionList:
+            features.append(f(state))
+        return features
+
+    return featureExtractor
 
 
 def getEvalFunctionViaTDlearning(game, featureExtractorFunction, num_trials=100):
