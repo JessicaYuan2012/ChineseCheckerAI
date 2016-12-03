@@ -90,6 +90,8 @@ def simulate(game, rl, numTrials=100, maxIterations=200, verbose=False):
         ax.plot(range(1, numTrials + 1), weight_update_history[rl.weights.keys()[i]],
                 format_list[i], label=rl.weights.keys()[i])
     legend = ax.legend(loc='upper center', shadow=True)
+    plt.ylabel('weight value')
+    plt.xlabel('# iteration')
     return utility_list
 
 

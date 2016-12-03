@@ -80,11 +80,25 @@ if __name__ == '__main__':
     # evalFunction2 = getEvalFunctionViaTDlearning(ccgame, featureExtractor2, num_trials=1000)
     # tdAgent2 = MiniMaxAlphaBetaAgent(ccgame, depth=2, evalFunction=evalFunction2)
 
-    feature_weight_dict2 = {diffOfAvgMaxVerticalAdvance: -2.22857765432e-05,
-                            diffOfAvgSquaredVerDistToGoalVertex: 0.00464894511432,
-                            diffOfAvgVerDistToGoalVertex: 0.0165030686331}
+    feature_weight_dict2 = {diffOfAvgMaxVerticalAdvance: -5.92186496368e-05,
+                            diffOfAvgSquaredVerDistToGoalVertex: 0.00441843679602,
+                            diffOfAvgVerDistToGoalVertex: 0.0145534806826}
     evalFunction2 = getEvalFunctionGivenWeights(feature_weight_dict2)
     tdAgent2 = MiniMaxAlphaBetaAgent(ccgame, depth=2, evalFunction=evalFunction2)
 
-    simulateMultipleGames({1: tdAgent2, 2: tdAgent1}, 400, ccgame)
+    # td-agent 3 (4 features)
+    # featureFuctionList3 = [diffOfAvgVerDistToGoalVertex, diffOfAvgSquaredVerDistToGoalVertex,
+    #                        diffOfAvgMaxVerticalAdvance, intercept]
+    # featureExtractor3 = getFeatureExtractor(featureFuctionList3)
+    # evalFunction3 = getEvalFunctionViaTDlearning(ccgame, featureExtractor3, num_trials=1000)
+    # tdAgent3 = MiniMaxAlphaBetaAgent(ccgame, depth=2, evalFunction=evalFunction3)
+
+    feature_weight_dict3 = {intercept: 0.0308445738283,
+                            diffOfAvgMaxVerticalAdvance: -3.8784725201e-05,
+                            diffOfAvgSquaredVerDistToGoalVertex: 0.0053661434185,
+                            diffOfAvgVerDistToGoalVertex: 0.0134529315166}
+    evalFunction3 = getEvalFunctionGivenWeights(feature_weight_dict3)
+    tdAgent3 = MiniMaxAlphaBetaAgent(ccgame, depth=2, evalFunction=evalFunction3)
+
+    simulateMultipleGames({1: tdAgent3, 2: tdAgent2}, 400, ccgame)
     # plt.show()
