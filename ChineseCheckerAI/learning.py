@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 
 class TDLearningAlgorithm():
-    def __init__(self, game, featureExtractor, discount=1, explorationProb=0.1):
+    def __init__(self, game, featureExtractor, discount=1, explorationProb=0.15):
         self.game = game
         self.discount = discount
         self.featureExtractor = featureExtractor
@@ -77,52 +77,20 @@ def simulate(game, rl, numTrials=100, maxIterations=200, verbose=False):
             else:
                 print "Trial %d (final utility = %s)" % (trial + 1, 0)
                 utility_list.append(0)
-            print 'weights after trial:', trial+1
-            for feature in rl.weights:
-                weight_update_history[feature].append(rl.weights[feature])
+            print 'weights after trial:', trial + 1
+        print 'Trial %d' % (trial + 1)
+        for feature in rl.weights:
+            weight_update_history[feature].append(rl.weights[feature])
+            if verbose:
                 print feature, rl.weights[feature]
+
+    fig, ax = plt.subplots()
     format_list = ['r--', 'b--', 'g--', 'c--', 'm--', 'y--', 'k--']
     for i in range(0, len(rl.weights.keys())):
-        plt.plot(range(1, numTrials + 1), weight_update_history[rl.weights.keys()[i]], format_list[i])
+        ax.plot(range(1, numTrials + 1), weight_update_history[rl.weights.keys()[i]],
+                format_list[i], label=rl.weights.keys()[i])
+    legend = ax.legend(loc='upper center', shadow=True)
     return utility_list
-
-
-def averageVerticalDistanceToGoalVertex(player):
-    def averageVerticalDistanceToGoalVertexOnePlayer(state):
-        board = state[1]
-        size = board.size
-        player_piece_pos_list = board.getPlayerPiecePositions(player)
-        if player == 1:
-            score = sum([pos[0] - 1 for pos in player_piece_pos_list]) * 1.0 / len(player_piece_pos_list)
-        else:
-            score = sum([2 * size - 1 - pos[0] for pos in player_piece_pos_list]) * 1.0 / len(player_piece_pos_list)
-        return 'avg vertical dist ' + str(player), score
-
-    return averageVerticalDistanceToGoalVertexOnePlayer
-
-
-def diffOfAvgVerDistToGoalVertex(state):
-    board = state[1]
-    size = board.size
-    player_piece_pos_list1 = board.getPlayerPiecePositions(1)
-    dist1 = sum([pos[0] - 1 for pos in player_piece_pos_list1]) * 1.0 / len(player_piece_pos_list1)
-    player_piece_pos_list2 = board.getPlayerPiecePositions(2)
-    dist2 = sum([2 * size - 1 - pos[0] for pos in player_piece_pos_list2]) * 1.0 / len(player_piece_pos_list2)
-    return 'diff of avg vertical dist', dist1 - dist2
-
-
-def verticalVariance(player):
-    def verticalVarianceOnePlayer(state):
-        board = state[1]
-        player_piece_row_list = [pos[0] for pos in board.getPlayerPiecePositions(player)]
-        var = np.var(player_piece_row_list)
-        return 'vertical var ' + str(player), var
-
-    return verticalVarianceOnePlayer
-
-
-def intercept(state):
-    return 'intercept', 1.0
 
 
 def getFeatureExtractor(featureFunctionList):
@@ -137,13 +105,26 @@ def getFeatureExtractor(featureFunctionList):
 
 def getEvalFunctionViaTDlearning(game, featureExtractorFunction, num_trials=100):
     tdLearningAgent = TDLearningAlgorithm(game, featureExtractorFunction)
-    simulate(game, tdLearningAgent, verbose=True, numTrials=num_trials)
+    simulate(game, tdLearningAgent, verbose=False, numTrials=num_trials)
+
+    for f in tdLearningAgent.weights:
+        print 'feature:', f, '; weight:', tdLearningAgent.weights[f]
 
     def resultEvalFunction(state):
         weights = tdLearningAgent.weights
         eval_score = 0
         for f, v in featureExtractorFunction(state):
             eval_score += weights[f] * v
+        return eval_score
+
+    return resultEvalFunction
+
+
+def getEvalFunctionGivenWeights(feature_weight_dict):
+    def resultEvalFunction(state):
+        eval_score = 0
+        for func, weight in feature_weight_dict.items():
+            eval_score += weight * func(state)[1]
         return eval_score
 
     return resultEvalFunction

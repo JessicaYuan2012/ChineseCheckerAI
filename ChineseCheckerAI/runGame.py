@@ -1,6 +1,7 @@
 from agent import *
 from game import SimplifiedChineseChecker
 from learning import *
+from features import *
 import datetime
 
 
@@ -54,25 +55,36 @@ def simulateMultipleGames(agents_dict, simulation_times, ccgame):
 
 if __name__ == '__main__':
     ccgame = SimplifiedChineseChecker(5, 3)
-    # # 0. human agent
-    # humanAgent = HumanAgent(ccgame)
-    # # 1. baseline - simple greedy agent
-    # simpleGreedyAgent = SimpleGreedyAgent(ccgame)
+    # 0. human agent
+    humanAgent = HumanAgent(ccgame)
+    # 1. baseline - simple greedy agent
+    simpleGreedyAgent = SimpleGreedyAgent(ccgame)
     # 2. minimax agent with naive evaluation function
     minimaxAgent = MiniMaxAlphaBetaAgent(ccgame, depth=2)
 
     # 3. minimax agent with different evaluation function learned via TD-learning
-    featureFuctionList1 = [averageVerticalDistanceToGoalVertex(1), averageVerticalDistanceToGoalVertex(2), intercept]
-    # featureFuctionList1 = [diffOfAvgVerDistToGoalVertex, intercept]
-    featureExtractor1 = getFeatureExtractor(featureFuctionList1)
-    evalFunction1 = getEvalFunctionViaTDlearning(ccgame, featureExtractor1, num_trials=500)
+    # td-agent 1 (2 features)
+    # featureFuctionList1 = [diffOfAvgVerDistToGoalVertex, diffOfAvgSquaredVerDistToGoalVertex]
+    # featureExtractor1 = getFeatureExtractor(featureFuctionList1)
+    # evalFunction1 = getEvalFunctionViaTDlearning(ccgame, featureExtractor1, num_trials=1000)
+    # tdAgent1 = MiniMaxAlphaBetaAgent(ccgame, depth=2, evalFunction=evalFunction1)
+    feature_weight_dict1 = {diffOfAvgSquaredVerDistToGoalVertex: 0.00328899184996,
+                            diffOfAvgVerDistToGoalVertex: 0.0238213005841}
+    evalFunction1 = getEvalFunctionGivenWeights(feature_weight_dict1)
     tdAgent1 = MiniMaxAlphaBetaAgent(ccgame, depth=2, evalFunction=evalFunction1)
 
-    # featureFuctionList2 = [averageVerticalDistanceToGoalVertex(1), averageVerticalDistanceToGoalVertex(2),
-    #                        verticalVariance(1), verticalVariance(2)]
+    # td-agent 2 (3 features)
+    # featureFuctionList2 = [diffOfAvgVerDistToGoalVertex, diffOfAvgSquaredVerDistToGoalVertex,
+    #                        diffOfAvgMaxVerticalAdvance]
     # featureExtractor2 = getFeatureExtractor(featureFuctionList2)
-    # evalFunction2 = getEvalFunctionViaTDlearning(ccgame, featureExtractor2, num_trials=100)
+    # evalFunction2 = getEvalFunctionViaTDlearning(ccgame, featureExtractor2, num_trials=1000)
     # tdAgent2 = MiniMaxAlphaBetaAgent(ccgame, depth=2, evalFunction=evalFunction2)
 
-    simulateMultipleGames({1: tdAgent1, 2: minimaxAgent}, 10, ccgame)
-    plt.show()
+    feature_weight_dict2 = {diffOfAvgMaxVerticalAdvance: -2.22857765432e-05,
+                            diffOfAvgSquaredVerDistToGoalVertex: 0.00464894511432,
+                            diffOfAvgVerDistToGoalVertex: 0.0165030686331}
+    evalFunction2 = getEvalFunctionGivenWeights(feature_weight_dict2)
+    tdAgent2 = MiniMaxAlphaBetaAgent(ccgame, depth=2, evalFunction=evalFunction2)
+
+    simulateMultipleGames({1: tdAgent2, 2: tdAgent1}, 400, ccgame)
+    # plt.show()
