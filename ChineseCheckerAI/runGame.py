@@ -21,6 +21,7 @@ def runGame(ccgame, agents):
             break
         # print 'player', str(player), 'takes action', str(action)
         state = ccgame.succ(state, action)
+    print '# of rounds:', iter
     print 'final board:'
     state[1].printBoard()
     end = datetime.datetime.now()
@@ -98,7 +99,9 @@ if __name__ == '__main__':
                             diffOfAvgSquaredVerDistToGoalVertex: 0.0053661434185,
                             diffOfAvgVerDistToGoalVertex: 0.0134529315166}
     evalFunction3 = getEvalFunctionGivenWeights(feature_weight_dict3)
-    tdAgent3 = MiniMaxAlphaBetaAgent(ccgame, depth=2, evalFunction=evalFunction3)
+    tdAgent3 = MiniMaxAlphaBetaAgent(ccgame, depth=2, evalFunction=evalFunction3, timing=True)
 
-    simulateMultipleGames({1: tdAgent3, 2: tdAgent2}, 400, ccgame)
+    simulateMultipleGames({1: minimaxAgent, 2: tdAgent3}, 5, ccgame)
+    print 'average time to get an action:', tdAgent3.total_exec_time/tdAgent3.num_exec
+
     # plt.show()
