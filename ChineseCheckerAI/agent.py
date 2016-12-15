@@ -1,4 +1,4 @@
-import random, re
+import random, re, datetime
 
 
 class Agent(object):
@@ -51,19 +51,35 @@ class RandomAgent(Agent):
 
 class MiniMaxAgent(Agent):
     # Minimax agent
+    def __init__(self, game, depth=3, timing=False):
+        self.game = game
+        # here the definition of depth is number of layers to visit in the game tree
+        self.depth = depth
+        self.timing = timing
+        if timing:
+            self.total_exec_time = datetime.timedelta(0)
+            self.num_exec = 0
+
     def getAction(self, state):
-        depth = 2
+        if self.timing:
+            start = datetime.datetime.now()
         legal_actions = self.game.actions(state)
         player = self.game.player(state)
-        score = [self.Vmaxmin(self.game.succ(state, action), depth) for action in legal_actions]
+        score = [self.Vmaxmin(self.game.succ(state, action), self.depth - 1) for action in legal_actions]
         if player == 1:
             max_score = max(score)
             max_actions = [legal_actions[index] for index in range(len(score)) if score[index] == max_score]
-            return random.choice(max_actions)
+            action = random.choice(max_actions)
         else:
             min_score = min(score)
             min_actions = [legal_actions[index] for index in range(len(score)) if score[index] == min_score]
-            return random.choice(min_actions)
+            action = random.choice(min_actions)
+
+        if self.timing:
+            end = datetime.datetime.now()
+            self.total_exec_time += end - start
+            self.num_exec += 1
+        return action
 
     # Define function Vmaxmin(s, d, agentnum) to compute the score
     def Vmaxmin(self, CurrentGameState, d):
@@ -99,22 +115,45 @@ class MiniMaxAgent(Agent):
 # Minimax with alpha beta pruning
 class MiniMaxAlphaBetaAgent(Agent):
     # Minimax agent
+    def __init__(self, game, depth=3, evalFunction=None, timing=False):
+        self.game = game
+        # here the definition of depth is number of layers to visit in the game tree
+        self.depth = depth
+        self.timing = timing
+        if evalFunction is None:
+            self.evaluationFunction = self.naiveEvaluationFunction
+        else:
+            self.evaluationFunction = evalFunction
+        if timing:
+            self.total_exec_time = datetime.timedelta(0)
+            self.num_exec = 0
+
     def getAction(self, state):
-        depth = 2
+        if self.timing:
+            start = datetime.datetime.now()
         legal_actions = self.game.actions(state)
+        if not legal_actions:  # stuck
+            return None
         player = self.game.player(state)
         alpha = -float('inf')
         beta = float('inf')
-        score = [self.alphabeta(self.game.succ(state, action), depth, alpha, beta, 3 - player) for action in
+        score = [self.alphabeta(self.game.succ(state, action), self.depth - 1, alpha, beta, 3 - player) for action in
                  legal_actions]
         if player == 1:
             max_score = max(score)
             max_actions = [legal_actions[index] for index in range(len(score)) if score[index] == max_score]
-            return random.choice(max_actions)
+            action = random.choice(max_actions)
         else:
             min_score = min(score)
             min_actions = [legal_actions[index] for index in range(len(score)) if score[index] == min_score]
-            return random.choice(min_actions)
+            action = random.choice(min_actions)
+
+        if self.timing:
+            end = datetime.datetime.now()
+            self.total_exec_time += end - start
+            self.num_exec += 1
+
+        return action
 
     def alphabeta(self, state, depth, alpha, beta, player):
         if self.game.isEnd(state):
@@ -144,7 +183,7 @@ class MiniMaxAlphaBetaAgent(Agent):
                     break
             return v
 
-    def evaluationFunction(self, currentGameState):
+    def naiveEvaluationFunction(self, currentGameState):
         size = self.game.size
         board = currentGameState[1]
         # The Evaluation function considers the sum of distances of each piece to the corner
