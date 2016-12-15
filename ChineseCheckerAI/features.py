@@ -2,8 +2,6 @@ import numpy as np
 from collections import defaultdict
 
 
-# good features
-
 def diffOfAvgVerDistToGoalVertex(state):
     board = state[1]
     size = board.size
@@ -24,8 +22,6 @@ def diffOfAvgSquaredVerDistToGoalVertex(state):
     dist2 = np.mean([(2 * size - 1 - pos[0]) ** 2 for pos in player_piece_pos_list2])
     return 'diff of avg squared vertical dist', dist2 - dist1  # weight should be positive
 
-
-# to be test
 
 def getVerticalAdvanceList1(state):
     board = state[1]
@@ -61,11 +57,6 @@ def getVerticalAdvanceList2(state):
             ver_adv_dict[pos] = max(ver_adv_dict[pos], new_pos[0] - pos[0])
     return ver_adv_dict.values()
 
-# def diffOfSumOfMaxVerticalAdvance(state):
-#     sum1 = sum(getVerticalAdvanceList1(state))
-#     sum2 = sum(getVerticalAdvanceList2(state))
-#     return 'diff of sum of max vertical advance', sum2 - sum1
-
 
 def diffOfAvgMaxVerticalAdvance(state):
     mean1 = np.mean(getVerticalAdvanceList1(state))
@@ -78,8 +69,6 @@ def diffOfMaxVerticalAdvance(state):
     max2 = max(getVerticalAdvanceList2(state))
     return 'diff of max vertical advance', max2 - max1
 
-
-# unnecessary features
 
 def diffOfAvgHorDistToCenter(state):
     # average horizontal distance to vertical center
@@ -112,6 +101,7 @@ def diffOfVerticalVariance(state):
     var2 = np.var(player_piece_row_list2)
     return 'diff of vertical var', var2 - var1
 
+
 def diffOfHorDistVariance(state):
     board = state[1]
     player_piece_pos_list1 = board.getPlayerPiecePositions(1)
@@ -119,6 +109,7 @@ def diffOfHorDistVariance(state):
     player_piece_pos_list2 = board.getPlayerPiecePositions(2)
     var2 = np.var([(col - board.getColNum(row) * 1.0 / 2) for row, col in player_piece_pos_list2])
     return 'diff of horizontal var', var2 - var1
+
 
 def intercept(state):
     return 'intercept', 1.0
