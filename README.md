@@ -42,8 +42,6 @@ feature_weight_dict1 = {diffOfAvgSquaredVerDistToGoalVertex: 0.00328899184996,
                             diffOfAvgVerDistToGoalVertex: 0.0238213005841}
 evalFunction1 = getEvalFunctionGivenWeights(feature_weight_dict1)
 tdAgent1 = MiniMaxAlphaBetaAgent(ccgame, depth=2, evalFunction=evalFunction1)
-simulateMultipleGames({1: minimaxAgent, 2: tdAgent3}, 5, ccgame)
-print 'average time to get an action:', tdAgent3.total_exec_time/tdAgent3.num_exec
 ```
 Or you can use a list of feature extraction functions, and get the weights via training process.
 ```python
