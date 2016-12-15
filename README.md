@@ -21,13 +21,11 @@ An AI agent to play Chinese Checkers in python 2.7.
 ## Usage
 In runGame.py, there're examples of usage of this program.
 Basically, you should choose 2 agents to play against each other.<br>
-1. Instantiate a game.
+`1.` Instantiate a game.
 ```python
 ccgame = SimplifiedChineseChecker(5, 3)
 ```
-
-2. Get your agents.
-
+`2.` Get your agents.
 ```python
 # 0. human agent
 humanAgent = HumanAgent(ccgame)
@@ -54,8 +52,7 @@ featureExtractor1 = getFeatureExtractor(featureFuctionList1)
 evalFunction1 = getEvalFunctionViaTDlearning(ccgame, featureExtractor1, num_trials=1000)
 tdAgent1 = MiniMaxAlphaBetaAgent(ccgame, depth=2, evalFunction=evalFunction1)
 ```
-
-3. Let your agents play against each other, and see the results and statistics output to the console.
+`3.` Let your agents play against each other, and see the results and statistics output to the console.
 Note that player 1 goes first as the agent, player 2 is the opponent.
 ```python
 simulateMultipleGames({1: minimaxAgent, 2: tdAgent1}, 50, ccgame)
