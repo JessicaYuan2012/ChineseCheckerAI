@@ -51,11 +51,15 @@ class RandomAgent(Agent):
 
 class MiniMaxAgent(Agent):
     # Minimax agent
-    def __init__(self, game, depth=3, timing=False):
+    def __init__(self, game, depth=3, evalFunction=None, timing=False):
         self.game = game
         # here the definition of depth is number of layers to visit in the game tree
         self.depth = depth
         self.timing = timing
+        if evalFunction is not None:
+            self.evaluationFunction = evalFunction
+        else:
+            self.evaluationFunction = self.naiveEvaluationFunction
         if timing:
             self.total_exec_time = datetime.timedelta(0)
             self.num_exec = 0
@@ -98,7 +102,7 @@ class MiniMaxAgent(Agent):
         else:
             return min(Allscore)
 
-    def evaluationFunction(self, currentGameState):
+    def naiveEvaluationFunction(self, currentGameState):
         size = self.game.size
         board = currentGameState[1]
         # The Evaluation function considers the sum of distances of each piece to the corner
@@ -170,6 +174,7 @@ class MiniMaxAlphaBetaAgent(Agent):
                 v = max(v, self.alphabeta(succ, depth - 1, alpha, beta, 3 - player))
                 alpha = max(alpha, v)
                 if beta <= alpha:
+                    # print 'pruned'
                     break
             return v
         else:
@@ -180,6 +185,7 @@ class MiniMaxAlphaBetaAgent(Agent):
                 v = min(v, self.alphabeta(succ, depth - 1, alpha, beta, 3 - player))
                 beta = min(beta, v)
                 if beta <= alpha:
+                    # print 'pruned'
                     break
             return v
 

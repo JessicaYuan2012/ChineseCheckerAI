@@ -61,7 +61,7 @@ if __name__ == '__main__':
     # 1. baseline - simple greedy agent
     simpleGreedyAgent = SimpleGreedyAgent(ccgame)
     # 2. minimax agent with naive evaluation function
-    minimaxAgent = MiniMaxAlphaBetaAgent(ccgame, depth=2)
+    # minimaxAgent = MiniMaxAlphaBetaAgent(ccgame, depth=2)
 
     # 3. minimax agent with different evaluation function learned via TD-learning
     # td-agent 1 (2 features)
@@ -72,7 +72,8 @@ if __name__ == '__main__':
     feature_weight_dict1 = {diffOfAvgSquaredVerDistToGoalVertex: 0.00328899184996,
                             diffOfAvgVerDistToGoalVertex: 0.0238213005841}
     evalFunction1 = getEvalFunctionGivenWeights(feature_weight_dict1)
-    tdAgent1 = MiniMaxAlphaBetaAgent(ccgame, depth=2, evalFunction=evalFunction1)
+    tdAgent1 = MiniMaxAlphaBetaAgent(ccgame, depth=3, evalFunction=evalFunction1, timing=True)
+    minimaxAgent = MiniMaxAgent(ccgame, depth=3, evalFunction=evalFunction1, timing=True)
 
     # td-agent 2 (3 features)
     # featureFuctionList2 = [diffOfAvgVerDistToGoalVertex, diffOfAvgSquaredVerDistToGoalVertex,
@@ -101,7 +102,9 @@ if __name__ == '__main__':
     evalFunction3 = getEvalFunctionGivenWeights(feature_weight_dict3)
     tdAgent3 = MiniMaxAlphaBetaAgent(ccgame, depth=2, evalFunction=evalFunction3, timing=True)
 
-    simulateMultipleGames({1: minimaxAgent, 2: tdAgent3}, 5, ccgame)
-    print 'average time to get an action:', tdAgent3.total_exec_time/tdAgent3.num_exec
+    simulateMultipleGames({1: minimaxAgent, 2: tdAgent1}, 2, ccgame)
+    print 'average time to get an action:', minimaxAgent.total_exec_time/minimaxAgent.num_exec
+    print 'average time to get an action:', tdAgent1.total_exec_time/tdAgent1.num_exec
+
 
     # plt.show()
